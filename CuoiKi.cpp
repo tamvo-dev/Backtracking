@@ -5,10 +5,11 @@
 using namespace std;
 
 const int MAX = 8;
+int numbercount = 0;
 // arr dùng để lưu vị trí của con ngựa đã đi
 int arr[MAX][MAX];
-int X[8] = { -2,-2,-1,-1, 1, 1, 2, 2 };
-int Y[8] = { -1, 1,-2, 2,-2, 2,-1, 1 };
+int X[8] = {1, 2, 2, 1, -1, -2, -2, -1};
+int Y[8] = {-2, -1, 1, 2, 2, 1, -1, -2};
 
 // Set gia tri mang arr bang 0
 void init() {
@@ -137,22 +138,39 @@ void minimumRun(int x, int y) {
 void backTrackRun(int x, int y) {
 
 	static int count = 1;
+	static bool isEnd = false;
+
 	arr[x][y] = count;
 
 	if (count == MAX * MAX) {
-		show();
-		exit(0);
+		isEnd = true;
+		return;
 	}
 	
+	int* numbers = new int[MAX];
+
 	for (int i = 0; i < MAX; i++) {
-		int u = x + X[i];
-		int v = y + Y[i];
-		
-		// Neu hop le thi cho di
-		if (isValid(u, v)) {
-			count++;
-			backTrackRun(u, v);
+		numbers[i] = numberRun(x + X[i], y + Y[i]);
+	}
+
+	int indexMin = 0;
+	int min = MAX;
+	for (int i = 0; i < MAX; i++) {
+		if (numbers[i] < min && isValid(x + X[i], y + Y[i])) {
+			min = numbers[i];
+			indexMin = i;
 		}
+	}
+
+	int u = x + X[indexMin];
+	int v = y + Y[indexMin];
+	if (isValid(u, v)) {
+		count++;
+		backTrackRun(u, v);
+	}
+
+	if (isEnd) {
+		return;
 	}
 
 	count--;
@@ -206,6 +224,7 @@ void menu() {
 		else {
 			init();
 			backTrackRun(x, y);
+			show();
 		}
 
 		system("pause");
